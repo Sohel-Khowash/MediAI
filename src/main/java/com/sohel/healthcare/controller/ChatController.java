@@ -31,4 +31,13 @@ public class ChatController {
                 "Say hello in exactly one sentence."
         );
     }
+
+    @GetMapping("/embedding/test")
+    public Integer embedding(){
+
+        return llmService
+                .embedding("Spring Boot")
+                .size();
+
+    }
 }
