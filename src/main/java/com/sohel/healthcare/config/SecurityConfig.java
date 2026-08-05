@@ -58,7 +58,10 @@ public class SecurityConfig {
                                 "/api/v1/register",
                                 "/api/v1/login",
                                 "/api/v1/health",
-                                "/api/v1/documents/upload"
+                                "/api/v1/documents/upload",
+                                "/api/v1/chat/test",
+                                "/api/v1/gemini/models",
+                                "/api/v1/chat/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
