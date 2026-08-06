@@ -219,7 +219,7 @@ Returns:
 ```
 POST /api/v1/documents/upload
 ```
-(images/UploadPdf.png)
+![Upload PDF](images/UploadPdf.png)
 
 
 Body
