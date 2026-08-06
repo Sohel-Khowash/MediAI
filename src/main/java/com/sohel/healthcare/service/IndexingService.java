@@ -20,17 +20,14 @@ public class IndexingService {
 
     public void indexDocument(String objectName) {
 
-        System.out.println("Starting document indexing...");
 
         String text = pdfExtractionService.extractText(objectName);
 
         List<Chunk> chunks = textChunker.chunk(text);
 
-        System.out.println("Chunks: " + chunks.size());
 
         for (Chunk chunk : chunks) {
 
-            System.out.println("Indexing chunk " + chunk.getIndex());
 
             qdrantService.storeChunk(
                     llmService.embedding(chunk.getText()),
@@ -39,6 +36,5 @@ public class IndexingService {
 
         }
 
-        System.out.println("Document indexed successfully.");
     }
 }

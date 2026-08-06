@@ -3,6 +3,7 @@ package com.sohel.healthcare.controller;
 import com.sohel.healthcare.rag.chat.ChatRequest;
 import com.sohel.healthcare.rag.chat.ChatResponse;
 import com.sohel.healthcare.service.LlmService;
+import com.sohel.healthcare.service.RagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,14 +12,13 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ChatController {
 
+    private final RagService ragService;
     private final LlmService llmService;
 
     @PostMapping
-    public ChatResponse chat(
-            @RequestBody ChatRequest request) {
+    public ChatResponse chat(@RequestBody ChatRequest request) {
 
-        String answer =
-                llmService.chat(request.getQuestion());
+        String answer = ragService.ask(request.getQuestion());
 
         return ChatResponse.builder()
                 .answer(answer)
@@ -27,17 +27,17 @@ public class ChatController {
 
     @GetMapping("/test")
     public String test() {
+
         return llmService.chat(
                 "Say hello in exactly one sentence."
         );
     }
 
     @GetMapping("/embedding/test")
-    public Integer embedding(){
+    public Integer embedding() {
 
         return llmService
                 .embedding("Spring Boot")
                 .size();
-
     }
 }

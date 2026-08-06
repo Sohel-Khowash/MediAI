@@ -5,7 +5,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +89,50 @@ public class QdrantService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+    }
+
+    public List<String> search(List<Float> embedding) {
+
+        var body = new java.util.HashMap<String, Object>();
+
+        body.put("vector", embedding);
+        body.put("limit", 3);
+        body.put("with_payload", true);
+
+        String response = webClient.post()
+                .uri(url() + "/collections/" + collection + "/points/query")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        try {
+
+            com.fasterxml.jackson.databind.JsonNode root =
+                    new com.fasterxml.jackson.databind.ObjectMapper()
+                            .readTree(response);
+
+            List<String> chunks = new java.util.ArrayList<>();
+
+            for (JsonNode point : root.path("result").path("points")) {
+
+                chunks.add(
+                        point.path("payload")
+                                .path("text")
+                                .asText()
+                );
+
+            }
+
+            return chunks;
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(e);
+
+        }
+
     }
 
 }
