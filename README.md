@@ -219,6 +219,8 @@ Returns:
 ```
 POST /api/v1/documents/upload
 ```
+(images/UploadPdf.png)
+
 
 Body
 
