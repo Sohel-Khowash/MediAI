@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -18,28 +21,23 @@ public class LlmService {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Value("${llm.embedding-model}")
-    private String embeddingModel;
-
     @Value("${llm.base-url}")
     private String baseUrl;
 
     @Value("${llm.chat-model}")
-    private String model;
+    private String chatModel;
+
+    @Value("${llm.embedding-model}")
+    private String embeddingModel;
 
     public String chat(String prompt) {
 
         try {
 
-            System.out.println("Sending request to Ollama...");
-
-            String request = """
-                {
-                    "model":"%s",
-                    "prompt":"%s",
-                    "stream":false
-                }
-                """.formatted(model, prompt.replace("\"", "\\\""));
+            Map<String, Object> request = new HashMap<>();
+            request.put("model", chatModel);
+            request.put("prompt", prompt);
+            request.put("stream", false);
 
             String response = webClient.post()
                     .uri(baseUrl + "/api/generate")
@@ -47,18 +45,14 @@ public class LlmService {
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(String.class)
-                    .doOnNext(r -> System.out.println("Response received"))
                     .block();
-
-            System.out.println(response);
 
             JsonNode root = mapper.readTree(response);
 
             return root.get("response").asText();
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ollama chat failed", e);
         }
     }
 
@@ -66,16 +60,9 @@ public class LlmService {
 
         try {
 
-            String request = """
-                {
-                    "model":"%s",
-                    "input":"%s"
-                }
-                """
-                    .formatted(
-                            embeddingModel,
-                            text.replace("\"","\\\"")
-                    );
+            Map<String, Object> request = new HashMap<>();
+            request.put("model", embeddingModel);
+            request.put("input", text);
 
             String response = webClient.post()
                     .uri(baseUrl + "/api/embed")
@@ -87,29 +74,24 @@ public class LlmService {
 
             JsonNode root = mapper.readTree(response);
 
-            JsonNode array =
-                    root.get("embeddings").get(0);
+            JsonNode embeddings = root.get("embeddings");
 
-            List<Float> vector =
-                    new ArrayList<>();
+            if (embeddings == null || embeddings.isEmpty()) {
+                throw new RuntimeException("No embeddings returned from Ollama.");
+            }
 
-            for(JsonNode node : array){
+            JsonNode vectorNode = embeddings.get(0);
 
-                vector.add(
-                        node.floatValue()
-                );
+            List<Float> vector = new ArrayList<>();
 
+            for (JsonNode value : vectorNode) {
+                vector.add(value.floatValue());
             }
 
             return vector;
 
+        } catch (Exception e) {
+            throw new RuntimeException("Ollama embedding failed", e);
         }
-        catch (Exception e){
-
-            throw new RuntimeException(e);
-
-        }
-
     }
-
 }

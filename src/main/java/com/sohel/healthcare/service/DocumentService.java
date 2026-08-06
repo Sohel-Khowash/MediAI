@@ -21,6 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentService {
 
+    private final IndexingService indexingService;
     private final TextChunker textChunker;
     private final PdfExtractionService pdfExtractionService;
     private final MinioClient minioClient;
@@ -73,6 +74,9 @@ public class DocumentService {
                     .build();
 
             document = documentRepository.save(document);
+            indexingService.indexDocument(
+                    document.getObjectName()
+            );
 
             return DocumentResponse.builder()
                     .id(document.getId())

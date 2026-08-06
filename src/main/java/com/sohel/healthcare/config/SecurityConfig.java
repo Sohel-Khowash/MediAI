@@ -55,13 +55,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/error",
                                 "/api/v1/register",
                                 "/api/v1/login",
                                 "/api/v1/health",
                                 "/api/v1/documents/upload",
                                 "/api/v1/chat/test",
                                 "/api/v1/gemini/models",
-                                "/api/v1/chat/**"
+                                "/api/v1/chat/**",
+                                "/api/v1/qdrant/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
