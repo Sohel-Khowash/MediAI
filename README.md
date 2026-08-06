@@ -219,7 +219,6 @@ Returns:
 ```
 POST /api/v1/documents/upload
 ```
-![Upload PDF](images/UploadPdf.png)
 
 
 Body
@@ -317,30 +316,33 @@ Final Answer
 
 ## User Authentication
 
-(Add Postman Screenshot)
+![Upload PDF](images/JWTtoken.png)
 
 ---
 
 ## Upload PDF
 
-(Add Screenshot)
+![Upload PDF](images/UploadPdf.png)
 
 ---
 
 ## Extract Text
 
-(Add Screenshot)
+![Upload PDF](images/text.png)
+
+
 
 ---
 
 ## Generated Chunks
 
-(Add Screenshot)
+![Upload PDF](images/chunks.png)
 
 ---
 
 ## Chat Response
 
+![Upload PDF](images/Chat.png)
 
 ---
 
